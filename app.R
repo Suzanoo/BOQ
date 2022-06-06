@@ -7,6 +7,7 @@
 library(shiny)
 library(dplyr)
 library(ggplot2)
+library(plotly)
 library(glue)
 library(sass)
 library(shiny.fluent)
@@ -70,7 +71,7 @@ server <- function(input, output, session) {
       data <- as.data.frame(read_excel("BOQ.xlsx", sheet = 1, na = "")) %>% 
         filter(QTY != 0) %>% # get rid of missing value for table render and bar&pi render
         replace(is.na(.), 0) %>% 
-        mutate(across(is.numeric, round, digits = 4))
+        mutate(dplyr::across(is.numeric, round, digits = 4))
       
       data
     }
@@ -79,7 +80,7 @@ server <- function(input, output, session) {
       data <- data0() %>% 
         filter(QTY != 0) %>% # get rid of missing value for table render and bar&pi render
         replace(is.na(.), 0) %>% 
-        mutate(across(is.numeric, round, digits = 4))
+        mutate(dplyr::across(is.numeric, round, digits = 4))
       
       data
     }
@@ -153,9 +154,59 @@ server <- function(input, output, session) {
     pi_plotSRV("pi_plot2", df1, combo2(), polar = TRUE)
   })
   
+  # # render WBS level 3
+  v3<- reactive({
+    req <- df()
+    df() %>% 
+      select(2) %>%
+      unique() %>% 
+      pull
+  })
   
+  combo3 <- callModule(combo_SRV, "combo3", v3())
   
+  observeEvent(input$wbs_Btn3, {
+    req(df())
+    df1 <- df() %>%
+      select(2, 3, AMOUNT) # Level 2, Level 3, AMOUNT
+    pi_plotSRV("pi_plot3", df1, combo3())
+  })
   
+  ## render WBS level 4
+  v4 <- reactive({
+    req <- df()
+    df() %>% 
+      select(3) %>%
+      unique() %>% 
+      pull
+  })
+  
+  combo4 <- callModule(combo_SRV, "combo4", v4())
+  
+  observeEvent(input$wbs_Btn4, {
+    req(df())
+    df1 <- df() %>%
+      select(3, 4, AMOUNT)
+    pi_plotSRV("pi_plot4", df1, combo4())
+  })
+  
+  ## render Description
+  v5 <- reactive({
+    req <- df()
+    df() %>% 
+      select(4) %>%
+      unique() %>% 
+      pull
+  })
+  
+  combo5 <- callModule(combo_SRV, "combo5", v5())
+  
+  observeEvent(input$wbs_Btn5, {
+    req(df())
+    df1 <- df() %>%
+      select(4, 5, QTY) # Level 3, Level 4, QTY
+    pi_plotSRV("pi_plot5", df1, combo5(), logscale = TRUE)
+  })
   
   
   

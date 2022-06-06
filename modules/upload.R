@@ -1,6 +1,5 @@
 # Module Credit: https://git.wur.nl/-/snippets/92
 library(readxl)
-
 uploadUI <- function(id, ...) {
   ns <- NS(id)
   fileInput(ns("file_upload"), ..., accept = c(".csv", ".xls", ".xlsx", ".xlsm"))
@@ -25,10 +24,12 @@ uploadSRV <- function(id, attempt = function() {NULL}, ...) {
           if (grepl("*[.]xlsx$|[.]xls$|[.]xlsm$", filename)) {
             tryCatch({sheets <- excel_sheets(filename)}, error = function(e) {})
             tryCatch({
-              # convert char of number of date (ex.48254) to date format (ex.2022-01-01)
-              y <- names(read_excel(filename, 1, n_max = 0, .name_repair = "minimal"))
-              y <- convert_intTOdate(y)
-              headers <- unique(y)
+              df <- read_excel(filename, 1, n_max = 0, .name_repair = "minimal")
+              y <- convert_intTOdate(names(df)) %>% 
+                duplicated_check()
+              # headers <- unique(y)
+              headers <- y
+              
             }, error = function(e) {})
             
           } else if (grepl("*[.]csv$", filename)) {
@@ -61,15 +62,13 @@ uploadSRV <- function(id, attempt = function() {NULL}, ...) {
           headers <- character(0)
           
           tryCatch({
-            y <- names(read_excel(filename, input$selectSheet, n_max = 0, skip = req(input$sliderSkipRows), .name_repair = "minimal"))
-            # print("y1")
-            # print(y)
-            # convert char of number of date (ex.48254) to date format (ex.2022-01-01)
-            y <- convert_intTOdate(y)
-            # print("y2")
-            # print(y)
-            headers <- unique(y)
+            df <- read_excel(filename, input$selectSheet, n_max = 0, skip = req(input$sliderSkipRows), .name_repair = "minimal")
+            y <- convert_intTOdate(names(df)) %>% 
+              duplicated_check()
+            # headers <- unique(y)
+            headers <- y
           },
+          
           error = function(e) {}
           )
           
@@ -88,10 +87,9 @@ uploadSRV <- function(id, attempt = function() {NULL}, ...) {
             data <- as.data.frame(read_excel(filename, sheet = input$selectSheet, skip = input$sliderSkipRows, na = ""))
             # data <- as.data.frame(read_excel(filename, sheet = input$selectSheet, skip = input$sliderSkipRows, na = "",
             #                                  col_types = "text", .name_repair = "minimal"))
-            
-            names(data) <- convert_intTOdate(names(data))
-            # print("data")
-            # print(names(data))
+            y <- convert_intTOdate(names(data)) %>% 
+              duplicated_check()
+            names(data) <- y
             data
             
           } else if(grepl("*[.]csv$", filename)) {

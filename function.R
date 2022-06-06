@@ -41,8 +41,9 @@ render_table <- function(df){
 convert_intTOdate <- function(y){
   list <- NULL
   for(i in c(1:length(y))){
-    if(!is.na(stringr::str_match(y[i], "[0-9]{5}"))){
-      list[i] = as.Date(as.numeric(y[i]), origin = "1899-12-30") %>%
+    if(!is.na(stringr::str_match(y[i], "[0-9]{4}...[0-9]{2}"))){
+      x <- substr(y[i], start = 1, stop = 5)
+      list[i] = as.Date(as.numeric(x), origin = "1899-12-30") %>%
         as.character() #save to as character of date format
     }else{
       list[i] = y[i]
@@ -51,7 +52,26 @@ convert_intTOdate <- function(y){
   list
 }
 
+duplicated_check <- function(y){
+  list <- NULL
+  for (i in c(1:length(y))){
+    if(!y[i] %in% list){
+      list[i] <- y[i]
+    }else{
+      list[i] <- paste0(y[i],".y") # add ".y" if duplicated
+    }
+  }
+  list
+}
 
+# change date-time format of ex.44592...26 --> 31/1/22
+format_dt <- function(df){
+  name <- names(df) %>%
+    substr(start = 1, stop = 5) %>%
+    convert_intTOdate()
+  names(df) <- name
+  df
+}
 
 
 
