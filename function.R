@@ -10,15 +10,8 @@ makeCard <- function(title, content, size = 12, style = "") {
   )
 }
 
-makePage <- function (title, subtitle, contents) {
-  tagList(div(
-    class = "page-title",
-    span(title, class = "ms-fontSize-32 ms-fontWeight-semibold", style =
-           "color: #323130"),
-    span(subtitle, class = "ms-fontSize-14 ms-fontWeight-regular", style =
-           "color: #605E5C; margin: 14px;")
-  ),
-  contents)
+makePage <- function (contents) {
+  contents
 }
 
 # https://rstudio.github.io/DT/shiny.html
@@ -75,12 +68,14 @@ duplicated_check <- function(y){
 
 # material query
 materialQuery <- function(df, query){
-  x <- stringr::str_to_lower(query)
-  y <- stringr::str_to_upper(query)
-  z <- stringr::str_to_title(query)
+  query <- strsplit(query, split = ",| ,|, ")
+  
+  x <- lapply(query, stringr::str_to_lower) %>% unlist
+  y <- lapply(query, stringr::str_to_upper) %>% unlist
+  z <- lapply(query, stringr::str_to_title) %>% unlist
   pattern <- c(x, y, z)
   df %>% 
-    filter(stringr::str_detect(DESCRIPTION, paste(pattern, collapse="|")))
+    filter(grepl(paste0(pattern, collapse="|"), DESCRIPTION))
 }
 
 # create table based on query input
