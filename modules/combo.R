@@ -11,7 +11,7 @@ combo_UI <- function(id) {
   ComboBox.shinyInput(ns("combo"), options = NULL, placeholder = "Select one to Render")
 }
 
-combo_SRV <- function(input, output, session, selector) {
+combo_SRV <- function(input, output, session, selector = NULL) {
   ns <- session$ns
   
   observeEvent(selector, {

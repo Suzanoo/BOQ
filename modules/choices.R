@@ -1,8 +1,11 @@
 options_created <- function(data){
-  data %>% 
-    as_tibble() %>% 
-    setNames("key") %>% 
-    mutate(text = data)
+  if(!is.null(data)){
+    data %>% 
+      as_tibble() %>% 
+      setNames("key") %>% 
+      mutate(text = data)
+  }
+  
 }
 
 choices_UI <- function(id){
@@ -10,7 +13,7 @@ choices_UI <- function(id){
   div(
     tagList(
       reactOutput(ns("modal")),
-      # PrimaryButton.shinyInput(ns("showModal"), text = "Select items"),
+      PrimaryButton.shinyInput(ns("showModal"), text = "Select items"),
     )
   )
 }
@@ -21,8 +24,8 @@ choices_SRV <- function(id, choices){
     function(input, output, session){
       y <- reactiveValues(valurs = NULL)
       
-      modalVisible <- reactiveVal(TRUE)
-      # observeEvent(input$showModal, modalVisible(TRUE))
+      modalVisible <- reactiveVal(FALSE)
+      observeEvent(input$showModal, modalVisible(TRUE))
       observeEvent(input$hideModal, modalVisible(FALSE))
       observeEvent(input$btnOK, modalVisible(FALSE))
       observeEvent(input$dismiss, modalVisible(FALSE))

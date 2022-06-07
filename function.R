@@ -58,25 +58,128 @@ duplicated_check <- function(y){
     if(!y[i] %in% list){
       list[i] <- y[i]
     }else{
-      list[i] <- paste0(y[i],".y") # add ".y" if duplicated
+      list[i] <- paste0(y[i],".y") # add suffix ".y" if duplicated
     }
   }
   list
 }
 
 # change date-time format of ex.44592...26 --> 31/1/22
-format_dt <- function(df){
-  name <- names(df) %>%
-    substr(start = 1, stop = 5) %>%
-    convert_intTOdate()
-  names(df) <- name
+# format_dt <- function(df){
+#   name <- names(df) %>%
+#     substr(start = 1, stop = 5) %>%
+#     convert_intTOdate()
+#   names(df) <- name
+#   df
+# }
+
+# material query
+materialQuery <- function(df, query){
+  x <- stringr::str_to_lower(query)
+  y <- stringr::str_to_upper(query)
+  z <- stringr::str_to_title(query)
+  pattern <- c(x, y, z)
+  df %>% 
+    filter(stringr::str_detect(DESCRIPTION, paste(pattern, collapse="|")))
+}
+
+# create table based on query input
+query_table <- function(df, floors_name){
+  df1 <- df %>%
+    select(DESCRIPTION, matches(floors_name)) %>%
+    tidyr::pivot_longer(-DESCRIPTION) %>%
+    tidyr::pivot_wider(names_from = 1, values_fn = sum)
+  names(df1)[1] <- "Floor"
+  df1
+}
+
+# Multi bar plot
+multi_barplot <- function(df, floors_name){
+  
+  # create query table
+  df2 <- query_table(df, floors_name)
+  
+  # transpose table
+  df3 <- df2 %>% 
+    tidyr::pivot_longer(-Floor) %>% 
+    as.data.frame() %>% 
+    setNames(c("Floor", "Description", "QTY"))
+  
+  # plot
+  fig <- df3 %>%   
+    split(df3$Description) %>% 
+    purrr::map(plot_ly, x = ~Floor, y = ~QTY, type = "bar", name = ~Description)
+  
+  fig <- subplot(fig, nrows = ceiling(nrow(df3)/length(floors_name)))
+  fig 
+  
+}
+
+stackBarPlot <- function(df, floors_name){
+  df2 <- query_table(df, floors_name)
+  df3 <- df2 %>% 
+    tidyr::pivot_longer(-Floor) %>% 
+    as.data.frame() %>% 
+    setNames(c("Floor", "Description", "QTY"))
+  
+  fig <- df3 %>% 
+    plotly::plot_ly(x = ~Description, y = ~QTY, type = 'bar', 
+                    name = ~Floor, color = ~Floor) %>%
+    plotly::layout(yaxis = list(title = 'Qty (Log Scale)', type = 'log'),
+                   barmode = 'stack')
+  
+  fig
+}
+
+# method to create each progress table
+progress_table <- function(df){
+  df <- df %>% 
+    mutate(Temp = "Temp") %>% 
+    group_by(Temp) %>% 
+    dplyr::summarise_if(is.numeric, sum) %>% # sum all column
+    tidyr::pivot_longer(-Temp) %>% # transpose matrix
+    tidyr::pivot_wider(names_from = 1, values_fn = sum) %>% 
+    setNames(c("date", "progress")) %>% 
+    mutate(csum = cumsum(progress)) # cal accumulate 
   df
 }
 
-
-
-
-
+# create estimate and actual progress table prepare for plotting
+est.act_table <- function(df){
+  
+  # split column of estimate progress and actual progress
+  index <- grep("[0-9]{4}...[0-9]{2}", names(df))
+  index1 <- index[1:(length(index)/2)] # plane zone
+  index2 <- index[(1+length(index)/2):length(index)] # actual zone
+  
+  # split df of estimate progress and actual progress
+  estimate <- df[index1]
+  actual <- df[index2]
+  
+  # change date-time format
+  names(estimate) <- convert_intTOdate(names(estimate))
+  names(actual) <- convert_intTOdate(names(actual))
+  
+  # calculation
+  # we have %weigth column of each activity = wt
+  # we have %report in each cell --> ci = 30%, 40%, 50%, ...
+  # we multiply --> ci = wt * ci/100
+  weigth <- df %>% select(matches("Percent_Wt"))
+  
+  estimate <- estimate %>%
+    mutate_all(.,function(col){weigth$Percent_Wt*col/100})
+  
+  actual <- actual %>%
+    mutate_all(.,function(col){weigth$Percent_Wt*col/100})
+  
+  # merge and return
+  plan <-  progress_table(estimate)
+  
+  actual <-  progress_table(actual) %>% 
+    filter(progress != 0)
+  
+  return(list(plan, actual))
+}
 
 
 
