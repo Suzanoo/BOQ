@@ -1,6 +1,6 @@
-makeCard <- function(title, content, size = 12, style = "") {
+makeCard <- function(title, content, size = 12, style = "", depth = 8) {
   div(
-    class = glue::glue("card ms-depth-8 ms-sm{size} ms-xl{size}"),
+    class = glue::glue("card ms-depth-{depth} ms-sm{size} ms-xl{size}"),
     style = style,
     Stack(
       tokens = list(childrenGap = 5),

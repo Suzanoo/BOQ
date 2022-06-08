@@ -1,15 +1,16 @@
 home_page <- makePage(
   content <- div(
-    h3('How to ...???'),
-    p('-Dashboard เขียนด้วย ภาษา R ผู้ใช้ที่ลง R และ RStudio ไว้ในเครื่องสามารถ download source code ไปรันบนเครื่องได้ที่ github :  ',
+    h3('วิธีใช้งาน'),
+    p('-Dashboard เขียนด้วย ภาษา R ผู้ใช้ที่ลง R และ RStudio ไว้ในเครื่องสามารถ download source code ไปรันบนเครื่องได้ที่ github :  ได้ที่ github :  ',
       a(href = "https://github.com/Suzanoo/boq", "https://github.com/Suzanoo/boq")),
     
     p('-สามารถ upload excel file มาวิเคราะ์ได้โดยมีรูปแบบการเตรียมอธิบายด้านล่าง'),
-    p('-ในแพคเกจ จะมีไฟล์ตัวอย่าง  BOQ.xlsx ใช้เป็น default ของ dashboard นี้ ผู้ใช้สามารถ download ไฟล์นี้ได้ที่หน้า BOQ Table หรือ จาก package ที่ดาวน์โหลดมาจากลิงค์ด้านบนก็ได้'),
-    p('-BOQ.xlsx มี 3 ส่วน'),
+    p('-ในแพคเกจ จะมีไฟล์ตัวอย่าง  BOQ.xlsx ใช้เป็น default ของ dashboard นี้ ผู้ใช้สามารถ download ไฟล์นี้ที่ tab Table หรือ จาก package ที่ดาวน์โหลดมาจากลิงค์ด้านบนก็ได้วน์โหลดมาจากลิงค์ด้านบนก็ได้'),
+    p('ในไฟล์ตัวอย่าง BOQ.xlsx แบ่งเป็น 3 ส่วน'),
     tags$ol(
-      tags$li('ส่วนที่จำเป็นต้องมีและตั้งชื่อให้ตรงกัน ได้แก่ column --> "WBS_1", "WBS_2", "WBS_3", "WBS_4", "DESCRIPTION", "UNIT", "MAT.", "LAB.", "TOTAL"'),
-      tags$li('ชื่อแต่ละชั้น ตั้งชื่อต่างกันได้  โปรแกรมจะให้ระบุชื่อที่หน้าเพจ BOQ Table ได้แก่ column --> "SUB", "L1", "L2", "L3", ...'),
+      tags$li('ส่วนที่จำเป็นต้องมีและตั้งชื่อให้ตรงกัน ได้แก่ column --> “WBS_1", "WBS_2", "WBS_3", "WBS_4", "DESCRIPTION", "UNIT",
+“QTY”, "MAT.", "LAB.", "TOTAL”LAB.", "TOTAL"'),
+      tags$li('ส่วนของชื่อแต่ละชั้น ตั้งชื่อต่างกันได้  โปรมแกรมจะให้ระบุชื่อที่หน้าเพจ BOQ Table ได้แก่ column --> “SUB, "L1”, “L2”, “L3”, “L4”, “Extenal”, ...’ หรือถ้าไม่ต้องการแยกเป็นชั้นๆก็ใส่ปริมาณรวมไว้ที่ column “QTY” ทั้งหมดก็ได้ และ tab WBS by Floor Select ก็ข้ามไป'),
       tags$li('ส่วน Progress - S curve ไม่จำเป็นต้องมี ได้แก่ column -->”Percent_Wt”, column  วันที่ต่างๆ แต่ถ้าต้องการทำ S-curve ดูการเตรียมข้อมูลจากไฟล์ BOQ.pdf ที่ดาวน์โหลดจากลิงค์ด้านบน'),
       tags$li('ทุกๆ column สามารถสลับตำแหน่งได้'),
     ),
@@ -162,23 +163,28 @@ material_query <- makePage(
         textInput('query', "Search",
                   placeholder = 'concrete, formwork, 20mm, ...'),
         PrimaryButton.shinyInput("matBtn1", text = "Click to Render Table"),
-        makeCard("", DT::DTOutput("mat_table"), style = " background-color : lightgrey;")
+        makeCard("",
+                 DT::DTOutput("mat_table"),
+                 style = " background-color : lightgrey;"),
+        
       )
     ),
+   
     fluidRow(
       Stack(
         ChoiceGroup.shinyInput("radio", label = "Select Model",
                                options = options_created(c("stack", "subplot")),
                                value = "stack"
         ),
-        PrimaryButton.shinyInput("matBtn2", text = "Click to Render Graph"),
         hr(),
+        PrimaryButton.shinyInput("matBtn2", text = "Click to Render Graph"),
         makeCard("Query Plot",
                  plotlyOutput("mat_plot"),
                  style = " background-color : lightgrey;")
        
       )
-    )
+    ),
+    
   )
 )
 

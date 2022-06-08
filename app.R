@@ -61,8 +61,8 @@ server <- function(input, output, session) {
                 "UNIT", "MAT.", "LAB.", "TOTAL")
   
   # initial floor name --> change later by user
-  floor = c("SUB", "L1", "1M", "L2", "L3", "CM1A/B", "CM2A/B",
-            "CM3A/B", "CM4A/B", "CM5A/B", "CM6A/B", "L4", "L4M")  
+  floor = c("SUB", "L1", "1M", "L2", "L3", "MC1", "MC2",
+            "MC3", "MC4", "MC5", "MC6", "L4", "L4M", "External")  
   
   # call module upload
   data0 <- uploadSRV("file_upload")
@@ -241,6 +241,13 @@ server <- function(input, output, session) {
   floor_df <- eventReactive(input$floorBtn, {
     selector <- f$Z()$text
     df <- df()
+    
+    # in case no have floor column of new file upload
+    check <- names(df)
+    if(!selector %in% check){
+      selector <- NULL
+    }
+    
     if(!is.null(selector)){
       y <- df %>% 
         select(matches(selector)) %>% # select spec floor column
@@ -254,7 +261,7 @@ server <- function(input, output, session) {
         filter(!is.null(QTY) & QTY != 0 & QTY != "") %>% 
         mutate(AMOUNT = QTY*TOTAL)
     }else{
-      shinyalert::shinyalert("Error!", "Select a floor first.", type = "error")
+      shinyalert::shinyalert("Error!", "No floor column or  you are not define truth floor name at table tab or you are not select a floor before click render.", type = "error")
       return(NULL)
     }
   })
