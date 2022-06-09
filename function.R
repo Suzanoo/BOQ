@@ -23,11 +23,16 @@ render_table <- function(df){
   #   pageLength = 5, autoWidth = TRUE
   # )) #--> TODO not working now
   # DT::datatable(df, editable = 'cell')
-  DT::datatable(df, rownames= FALSE, extensions = 'Buttons',
-                options = list(dom = 'Bfrtip',
-                               buttons = c('copy', 'csv', 'excel', 'pdf', 'print'),
-                               pageLength = 5,
-                               scrollX = TRUE))
+  DT::datatable(df,
+                rownames= TRUE,
+                extensions = 'Buttons',
+                options = list(
+                  dom = 'Bfrtip',
+                  buttons = c('csv', 'excel'),
+                  pageLength = 5,
+                  scrollX = TRUE)
+                )
+
 } 
 
 # change date-time format of ex 44592 --> 31/1/22

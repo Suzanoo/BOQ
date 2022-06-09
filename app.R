@@ -103,12 +103,12 @@ server <- function(input, output, session) {
     } 
   })
   
-  output$table <- DT::renderDataTable( 
+  output$table <- DT::renderDataTable(server = FALSE, {# server = FALSE == download whole table
     if(!is.null(df())){
       render_table(df())
     }
-  )
-  
+  })
+
   #---------------------------
   ## WBS 
   #---------------------------
@@ -267,11 +267,11 @@ server <- function(input, output, session) {
   })
   
   # render table of selected floor
-  output$floor_table <- DT::renderDataTable(
+  output$floor_table <- DT::renderDataTable(server = FALSE, {
     if(!is.null(floor_df())){
       render_table(floor_df())
     }
-  )
+  })
 
   # render wbs 3 of selected floor
   output$floor <- renderPlotly({
@@ -363,11 +363,11 @@ server <- function(input, output, session) {
   })
   
   # render table of query item
-  output$mat_table <- DT::renderDataTable( 
+  output$mat_table <- DT::renderDataTable(server = FALSE, {
     if(!is.null(mat_query())){
       render_table(mat_query())
     }
-  )
+  })
   
   # render graph of query item
   # mode <- radioSRV("radio1", c("stack", "subplot"))

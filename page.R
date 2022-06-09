@@ -1,31 +1,27 @@
 home_page <- makePage(
   content <- div(
     h3('วิธีใช้งาน'),
-    p('-Dashboard เขียนด้วย ภาษา R ผู้ใช้ที่ลง R และ RStudio ไว้ในเครื่องสามารถ download source code ไปรันบนเครื่องได้ที่ github :  ได้ที่ github :  ',
-      a(href = "https://github.com/Suzanoo/boq", "https://github.com/Suzanoo/boq")),
-    
-    p('-สามารถ upload excel file มาวิเคราะ์ได้โดยมีรูปแบบการเตรียมอธิบายด้านล่าง'),
-    p('-ในแพคเกจ จะมีไฟล์ตัวอย่าง  BOQ.xlsx ใช้เป็น default ของ dashboard นี้ ผู้ใช้สามารถ download ไฟล์นี้ที่ tab Table หรือ จาก package ที่ดาวน์โหลดมาจากลิงค์ด้านบนก็ได้วน์โหลดมาจากลิงค์ด้านบนก็ได้'),
+    p('Dashboard เขียนด้วยภาษา R เครื่องที่ติดตั้ง R และ RStudio สามารถดาวน์โหลด source code ไปรันบนเครื่องได้ที่ github : ', a(href = "https://github.com/Suzanoo/BOQ", "https://github.com/Suzanoo/BOQ")),
+    p('สามารถ upload excel file มาวิเคราะห์ได้โดยมีรูปแบบการเตรียมอธิบายด้านล่าง'),
+    p('ไฟล์ตัวอย่าง  BOQ.xlsx ใช้เป็น default ของ dashboard นี้ ผู้ใช้สามารถ download ไฟล์นี้ที่ tab Table หรือ จาก package ที่ดาวน์โหลดมาจากลิงค์ด้านบนก็ได้'),
     p('ในไฟล์ตัวอย่าง BOQ.xlsx แบ่งเป็น 3 ส่วน'),
     tags$ol(
       tags$li('ส่วนที่จำเป็นต้องมีและตั้งชื่อให้ตรงกัน ได้แก่ column --> “WBS_1", "WBS_2", "WBS_3", "WBS_4", "DESCRIPTION", "UNIT",
-“QTY”, "MAT.", "LAB.", "TOTAL”LAB.", "TOTAL"'),
-      tags$li('ส่วนของชื่อแต่ละชั้น ตั้งชื่อต่างกันได้  โปรมแกรมจะให้ระบุชื่อที่หน้าเพจ BOQ Table ได้แก่ column --> “SUB, "L1”, “L2”, “L3”, “L4”, “Extenal”, ...’ หรือถ้าไม่ต้องการแยกเป็นชั้นๆก็ใส่ปริมาณรวมไว้ที่ column “QTY” ทั้งหมดก็ได้ และ tab WBS by Floor Select ก็ข้ามไป'),
-      tags$li('ส่วน Progress - S curve ไม่จำเป็นต้องมี ได้แก่ column -->”Percent_Wt”, column  วันที่ต่างๆ แต่ถ้าต้องการทำ S-curve ดูการเตรียมข้อมูลจากไฟล์ BOQ.pdf ที่ดาวน์โหลดจากลิงค์ด้านบน'),
+“QTY”, "MAT.", "LAB.", "TOTAL”, “AMOUNT”'),
+      tags$li('ส่วนของชื่อแต่ละชั้นหรือโซน ตั้งชื่อต่างกันได้  โปรแกรมจะถามชื่อแต่ละชั้นหรือโซนที่หน้าเพจ Table อีกครั้งได้แก่ column --> “SUB, "L1”, “L2”, “L3”, “L4”, “Extenal”, Zone1,  Zone2, ...’ หรือถ้าไม่ต้องการแยกวิเคราะห์ก็ใส่ปริมาณรวมไว้ที่ column “QTY” ทั้งหมดก็ได้ และ tab WBS by Floor Select ก็ข้ามไป'),
+      tags$li('ส่วน Progress - S curve ไม่จำเป็นต้องมี ได้แก่ column -->”Percent_Wt”, column  ของวันที่ต่างๆ แต่ถ้าต้องการทำ S-curve ดูการเตรียมข้อมูลจากไฟล์ BOQ.pdf ที่ดาวน์โหลดจากลิงค์ข้อด้านบน'),
       tags$li('ทุกๆ column สามารถสลับตำแหน่งได้'),
     ),
-    
-    p('-Dashboard มีทั้งหมด 6 pages'),
+    p('Dashboard มีทั้งหมด 6 pages'),
     tags$ol(
       tags$li('เพจ Home'),
-      tags$li('เพจ BOQ Table : แสดงในรูปแบบตาราง และด้านล่างมีปุ่มให้ผู้ใช้ป้อนข้อมูลชื่อชั้น เพื่อนำไปใช้งานที่เพจ WBS Floor Select ต่อไป'),
+      tags$li('เพจ Table : แสดงในรูปแบบตาราง และด้านล่างมีปุ่มให้ผู้ใช้ป้อนข้อมูลชื่อชั้นหรือโซน เพื่อนำไปใช้งานที่เพจ WBS Floor Select ต่อไป'),
       tags$li('WBS : แสดงกราฟของ working breakdown structure ระดับ 1-4 ซึ่งเพียงพอสำหรับทำ master schedule โดย 3 กราฟแรกหน่วยเป็นเงิน กราฟสุดท้ายมีหน่วยตามวัสดุในตาราง excel เช่น concrete = m3, formwork = m2, …'),
-      tags$li('WBS by Floor Select  เหมือนข้อ 3 แต่แสดงกราฟของเฉพาะชั้นตามที่ผู้ใช้เลือก โดยอ้างอิงชื่อของชั้นตามที่ผู้ใช้กรอกให้ข้อมูลในหน้า Table'),
-      tags$li('Material Query : แสดงรายการวัสดุตามที่ผู้ใช้ป้อนคำสอบถามเช่น 320ksc, formwork, D20, ...'),
-      tags$li('Progress Report : หน้านี้ไม่จำเป็นต้องมี แต่ถ้าใน file excel มีข้อมูล progress สามารถ render graph ได้ รูปแบบการเตรียมข้อมูลดูได้จากไฟล์ BOQ.pdf ที่โหลดจากแพคเกจจากลิงค์ด้านบน'),
-      
+      tags$li('WBS by Floor Select  เหมือนข้อ 3 แต่แสดงเฉพาะตารางและกราฟกรองตามชืื่อชั้นตามที่ผู้ใช้เลือก โดยอ้างอิงชื่อของชั้นตามที่ผู้ใช้กรอกให้ข้อมูลในหน้า Table'),
+      tags$li('Material Query : แสดงรายการวัสดุกรองตามชื่อที่ผู้ใช้ป้อนคำสอบถามเช่น concrete, 320ksc, formwork, D20, ...สามารถ query พร้อมกันหลายๆคำได้โดยคั่นด้วย comma(,)'),
+      tags$li('Progress Report : หน้านี้ไม่จำเป็นต้องมี แต่ถ้าใน file excel มีข้อมูล progress สามารถ render graph ได้ รูปแบบการเตรียมข้อมูลดูได้จากไฟล์ BOQ.pdf ที่โหลดจากแพคเกจจากลิงค์ข้อ 1'),
     ),
-    p('-โปรแกรมใช้ แพคเกจ plotly ในการทำกราฟ สามารถดูข้อมูลบนกราฟแบบ interaction ได้ เป็นประโยชน์มากในการ presentation')
+    p('โปรแกรมใช้ แพคเกจ plotly ในการทำกราฟ สามารถดูข้อมูลบนกราฟแบบ interaction ได้ เป็นประโยชน์มากในการ presentation'),
     
   )
 )
@@ -37,11 +33,13 @@ table_page <- makePage(
     fluidRow(
       uploadUI("file_upload", ""),
       makeCard("", DT::DTOutput("table"), style = " background-color : lightgrey;"),
+      hr(),
       h4("Floor name of new file = ???  Click!"),
       h5("Skip this if no have new file"),
       choices_UI("floorDefine"),
       # PrimaryButton.shinyInput("floorDefineBtn", text = "All floor names = ? Click to assign"),
       verbatimTextOutput("floorDefinePrint")
+      
     )
   )
 )
@@ -114,9 +112,10 @@ floor_wbs <- makePage(
             shiny::tags$hr(),
             PrimaryButton.shinyInput("floorBtn", text = "Select a floor and click"),
             makeCard("", DT::DTOutput("floor_table"), style = " background-color : lightgrey;")
-            
-          )
-      )
+          ),
+          hr()
+      ),
+      
     ),
     fluidRow(
       div(class = 'col-lg-4 col-md-12 col-sm-12',
@@ -167,7 +166,8 @@ material_query <- makePage(
                  DT::DTOutput("mat_table"),
                  style = " background-color : lightgrey;"),
         
-      )
+      ),
+      hr()
     ),
    
     fluidRow(
