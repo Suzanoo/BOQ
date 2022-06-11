@@ -13,7 +13,7 @@
   display: flex;
 }
 
-.main {
+#main_content {
   grid-area: main;
   background-color: #faf9f8;
   padding-left: 40px;
@@ -21,6 +21,7 @@
   /*max-width: calc(100vw - 400px);*/
   max-height: calc(100vh - 100px);
   overflow: auto;
+  
 }
 
 .footer {
@@ -84,7 +85,9 @@
 }
 
 /*---------------------------------------------------------------*/
+/* IF the viewport is 768px or smaller, do this */
 @media only screen and (max-width: 768px){
+  
     .grid-container {
     display: grid;
     grid-template-columns: 100px 1fr;
@@ -97,6 +100,17 @@
       display:inline-block;
     }
     
+    #main_content {
+      grid-area: main;
+      background-color: #faf9f8;
+      padding-left: 40px;
+      padding-right: 32px;
+      /*max-width: calc(100vw - 400px);*/
+      max-height: calc(100vh - 100px);
+      margin-left: -100px;
+      overflow: auto;
+    }
+
     #sidenav{
     transform: translateX(-1000px);
     /*transform: translateY(-100%);*/
@@ -113,4 +127,6 @@
  
 }
 
-
+@media only screen and (width <= 768px){
+  
+}

@@ -252,11 +252,21 @@ server <- function(input, output, session) {
     df <- df()
     
     # in case no have floor column of new file upload
-    check <- names(df)
-    if(!selector %in% check){
-      selector <- NULL
-    }
+    # prevent Warning: Error in if: argument is of length zero
+    # https://stackoverflow.com/questions/27350636/argument-is-of-length-zero-in-if-statemen
     
+    check <- names(df)
+    
+    if(is.null(selector)){
+      selector <- NULL
+    }else{
+      if(!selector %in% check){
+        selector <- NULL
+      }else{
+        selector <- selector
+      }
+    }
+
     if(!is.null(selector)){
       y <- df %>% 
         select(matches(selector)) %>% # select spec floor column

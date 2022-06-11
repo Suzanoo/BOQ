@@ -23,10 +23,12 @@ function toggleMenu() {
     sidenav.classList.remove("showMenu");
     closeIcon.style.display = "none";
     menuIcon.style.display = "block";
+    
   } else {
     sidenav.classList.add("showMenu");
     closeIcon.style.display = "block";
     menuIcon.style.display = "none";
+ 
   }
 }
 
@@ -37,3 +39,4 @@ menuItems.forEach(
 )
 
 hamburger.addEventListener("click", toggleMenu);
+

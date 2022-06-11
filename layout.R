@@ -48,7 +48,7 @@ layout <- function(mainUI){
   div(class="grid-container",
     div(class='header', header),
     div(id ='sidenav', navigation),
-    div(class = "main", mainUI, id = 'main'),
+    div(id = "main_content", mainUI),
     div(class = "footer", footer)
   )
 }
