@@ -45,9 +45,18 @@ shiny_router_script_tag <- shiny::tags$script(type = "text/javascript", src = sh
 ui <- fluidPage(
   layout(router$ui),
   tags$head(
+    div(
+      HTML('<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">'),
+      HTML('<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">')
+      ),
     tags$link(href = "style.css", rel = "stylesheet", type = "text/css"),
+    div(
+      HTML('<script src="main.js" defer></script>')
+    ),
     shiny_router_script_tag
-))
+  ),
+  collapsible = TRUE,
+)
 
 # ------------
 server <- function(input, output, session) {

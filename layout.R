@@ -1,23 +1,35 @@
 header <- tagList(
-  div(Text(variant = "medium", "BOQ Analysis"), class = "title"),
+  div(class='title', "BOQ ANALYSIS"),
+  div(
+    HTML('
+         <button id="hamburgerBtn">
+            <!-- material icons https://material.io/resources/icons/ -->
+            <i class="menuIcon material-icons">menu</i>
+            <i class="closeIcon material-icons">close</i>
+        </button>
+         ')
+  )
   )
 
-navigation <- Nav(
+navigation <- Nav(class='menu',
   groups = list(
-    list(links = list(
-      list(name = 'Home', url = '#!/', key = 'home', icon = 'Home'),
-      list(name = 'Table', url = '#!/table', key = 'table', icon = 'Table'),
-      list(name = 'WBS', url = '#!/wbs', key = 'wbs', icon = 'AnalyticsReport'),
-      list(name = 'WBS by Floor Select', url = '#!/level', key = 'level', icon = 'AnalyticsReport'),
-      list(name = 'Material Query', url = '#!/material', key = 'level', icon = 'AnalyticsReport'),
-      list(name = 'Progress Report', url = '#!/progress', key = 'progress', icon = 'AnalyticsReport')
+    list(
+      links = list(
+        list(class='menuItem',name = 'Home', url = '#!/', key = 'home', icon = 'Home'),
+        list(class='menuItem',name = 'Table', url = '#!/table', key = 'table', icon = 'Table'),
+        list(class='menuItem',name = 'WBS', url = '#!/wbs', key = 'wbs', icon = 'BulletedTreeList'),
+        list(class='menuItem',name = 'WBS by Floor Select', url = '#!/level', key = 'level', icon = 'BulletedTreeList'),
+        list(class='menuItem',name = 'Material Query', url = '#!/material', key = 'level', icon = 'QueryList'),
+        list(class='menuItem',name = 'Progress Report', url = '#!/progress', key = 'progress', icon = 'BIDashboard'
+             )
       ))
   ),
-  initialSelectedKey = 'home',
+  initialSelectedKey = 'home', 
   styles = list(
     root = list(
       height = '100%',
       boxSizing = 'border-box',
+      border = "1px solid #eee",
       overflowY = 'auto'
     )
   )
@@ -32,12 +44,11 @@ footer <- Stack(
   Text(variant = "medium", nowrap = FALSE, "All rights reserved.")
 )
   
-
 layout <- function(mainUI){
-  div(class = "grid-container",
-      div(class = "header", header),
-      div(class = "sidenav", navigation),
-      div(class = "main", mainUI),
-      div(class = "footer", footer)
+  div(class="grid-container",
+    div(class='header', header),
+    div(id ='sidenav', navigation),
+    div(class = "main", mainUI, id = 'main'),
+    div(class = "footer", footer)
   )
 }
