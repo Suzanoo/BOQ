@@ -18,9 +18,9 @@ navigation <- Nav(class='menu',
         list(class='menuItem',name = 'Home', url = '#!/', key = 'home', icon = 'Home'),
         list(class='menuItem',name = 'Table', url = '#!/table', key = 'table', icon = 'Table'),
         list(class='menuItem',name = 'WBS', url = '#!/wbs', key = 'wbs', icon = 'BulletedTreeList'),
-        list(class='menuItem',name = 'WBS by Floor Select', url = '#!/level', key = 'level', icon = 'BulletedTreeList'),
-        list(class='menuItem',name = 'Material Query', url = '#!/material', key = 'level', icon = 'QueryList'),
-        list(class='menuItem',name = 'Progress Report', url = '#!/progress', key = 'progress', icon = 'BIDashboard'
+        list(class='menuItem',name = 'WBS by Floor Select', url = '#!/level', key = 'level', icon = 'QueryList'),
+        list(class='menuItem',name = 'Material Query', url = '#!/material', key = 'level', icon = 'SearchData'),
+        list(class='menuItem',name = 'Progress Report', url = '#!/progress', key = 'progress', icon = 'Chart'
              )
       ))
   ),

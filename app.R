@@ -429,112 +429,208 @@ server <- function(input, output, session) {
   ## Progress Report
   #---------------------------
   # create estimate and actual progress table prepare for plotting
-  est.act.table <- reactive({
-    req(data())
-    df <- data()
-    est.act_table(df)
+  df1 <- reactive({
+    file_path <- (paste0(getwd(), "/BOQ.xlsx"))
+    tryCatch(
+      expr = {
+        # read plan sheet 2
+        df1 <- readxl::read_excel(path = file_path, sheet = 2, na = "") %>%
+          filter(QTY != 0) %>%
+          filter(AMOUNT != 0) %>% 
+          replace(is.na(.), 0) %>%
+          mutate(across(is.numeric, round, digits = 4)) %>% 
+          mutate(weight = AMOUNT/sum(AMOUNT)) %>% 
+          relocate(weight, .after = AMOUNT)
+        
+      },
+      error = function(e){
+        shinyalert::shinyalert("Error!", "No plan sheet or actual sheet in BOQ.xlsx file.", type = "error")
+      }
+    )
+  })
+  
+  df2 <- reactive({
+    file_path <- (paste0(getwd(), "/BOQ.xlsx"))
+    tryCatch(
+      expr = {
+        # read plan sheet 2
+        df2 <- readxl::read_excel(path = file_path, sheet = 3, na = "") %>%
+          filter(QTY != 0) %>%
+          filter(AMOUNT != 0) %>% 
+          replace(is.na(.), 0) %>%
+          mutate(across(is.numeric, round, digits = 4)) %>% 
+          mutate(weight = AMOUNT/sum(AMOUNT)) %>% 
+          relocate(weight, .after = AMOUNT)
+        
+      },
+      error = function(e){
+        shinyalert::shinyalert("Error!", "No plan sheet or actual sheet in BOQ.xlsx file.", type = "error")
+      }
+    )
+  })
+  
+  
+  plan.actual.table <- eventReactive(input$progressBtn, {
+    
+    df1 <- df1()
+    df2 <- df2()
+
+    if(!is.null(df1) & !is.null(df2)){
+      
+      # plan table
+      names(df1) <- int_to_date(names(df1)) # change date-time format ex. 44592 --> 31/1/22
+      index1 <- grep("[0-9]{4}-[0-9]{2}-[0-9]{2}", names(df1))
+      
+      if(length(index1) != 0){
+        plan <- df1[index1] # fiter only date-time column
+        
+        weight <- df1 %>% select(matches("weight"))
+        
+        plan <- plan %>%
+          mutate_all(.,function(col){weight$weight*col/100})
+        
+        plan <-  progress_table(plan)
+        
+      }else{
+        shinyalert::shinyalert("Error!", "No date-time column in plan sheet", type = "error")
+        plan <- NULL
+        plan
+      }
+      
+      # actual table
+      names(df2) <- int_to_date(names(df2))
+      index2 <- grep("[0-9]{4}-[0-9]{2}-[0-9]{2}", names(df2))
+      
+      if(length(index2) != 0){
+        actual <- df2[index2]
+        weight <- df2 %>% select(matches("weight"))
+        
+        actual <- actual %>%
+          mutate_all(.,function(col){weight$weight*col/100})
+        
+        actual <-  progress_table(actual) %>% 
+          filter(progress != 0)
+      }else{
+        shinyalert::shinyalert("Error!", "No date-time column in actual sheet", type = "error")
+        actual <- NULL
+        actual
+      }
+      
+    }else{
+      shinyalert::shinyalert("Error!", "No plan sheet or actual sheet in BOQ.xlsx file.", type = "error")
+    }
+
+    # store & return
+    if(!is.null(plan) & !is.null(actual)){
+      list(plan, actual)
+    }else{
+      NULL
+    }
+
   })
   
   # render S-curve
   observeEvent(input$progressBtn, {
-    req(data())
-    df <- data()
+    req(plan.actual.table())
+    list <- plan.actual.table()
 
-    # grep date-time column
-    index <- grep("[0-9]{4}...[0-9]{2}", names(df))
-    if(length(index) != 0){
-      list <- est.act.table()
+    if(!is.null(list)){
       plan <- list[[1]]
       actual <- list[[2]]
       sct_plotSRV("scatter1", plan, actual)
-
-    }else{
-      shinyalert::shinyalert("Error!", "No date-time column to plot.", type = "error")
     }
   })
   
   # render value box
   observeEvent(input$progressBtn, {
-    req(est.act.table())
-    df <- data()
-    col <- grep("[0-9]{4}...[0-9]{2}", names(df))
-    time <- length(col)/2
+    req(plan.actual.table())
+    df1 <- df1()
+    df2 <- df2()
     
-    list <- est.act.table()
-    plan <- list[[1]] %>% mutate(dplyr::across(is.numeric, round, digits = 2))
-    actual <- list[[2]] %>% mutate(dplyr::across(is.numeric, round, digits = 2))
-    
-    x <- length(actual$progress)
-    this <- actual$progress[x]
-    acc.this <- actual$csum[x]
-    acc.previous <- actual$csum[x-1]
-    status <- round((acc.this - plan$csum[x])*time*30/100, digits = 0) #convert month to days
-    
-    # Actual table
-    df1 <- actual %>%
-      select(date, progress) %>%
-      setNames(c("x", "y")) %>%
-      as.data.frame()
-    
-    # Acc.Actual table
-    df2 <- actual %>%
-      select(date, csum) %>%
-      setNames(c("x", "y")) %>%
-      as.data.frame()
-    
-    vb1 <- list(
-      value = paste0(acc.previous,"%"),
-      data = df2,# with column name x, y
-      label = "",
-      chart_type = "",
-      subtitle = "",
-      info = "",
-      icon = icon("code"),
-      color = "orange"
-    )
-    
-    vboxSRV("vb1", vb1)
-    
-    vb2 <- list(
-      value = paste0(this,"%"),
-      data = df1,# with column name x, y
-      label = "",
-      chart_type = "",
-      subtitle = "",
-      info = "",
-      icon = icon("code"),
-      color = "orange"
-    )
-    
-    vboxSRV("vb2", vb2)
-    
-    vb3 <- list(
-      value = paste0(acc.this,"%"),
-      data = df1,# with column name x, y
-      label = "",
-      chart_type = "column",
-      subtitle = "",
-      info = "",
-      icon = icon("code"),
-      color = "orange"
-    )
-    
-    vboxSRV("vb3", vb3)
-    
-    vb4 <- list(
-      value = paste0(status, " days"),
-      data = df2,# with column name x, y
-      label = "",
-      chart_type = "line",
-      subtitle = "",
-      info = "",
-      icon = icon("code"),
-      color = "orange"
-    )
-    
-    vboxSRV("vb4", vb4)
-    
-    
+    if(!is.null(df1) & !is.null(df1)){
+      col <- grep("[0-9]{4}-[0-9]{2}-[0-9]{2}", names(df1))
+      time <- length(col)
+      
+      list <- plan.actual.table()
+      plan <- list[[1]] %>% mutate(dplyr::across(is.numeric, round, digits = 2))
+      actual <- list[[2]] %>% mutate(dplyr::across(is.numeric, round, digits = 2))
+      
+      x <- actual %>% 
+        select(progress) %>% 
+        filter(progress > 0) %>% 
+        pull() %>% 
+        length()
+      
+      this <- actual$progress[x]
+      acc.this <- actual$csum[x]
+      acc.previous <- actual$csum[x-1]
+      status <- round((acc.this - plan$csum[x])*time*30/100, digits = 2) #convert month to days
+      
+      # Actual table
+      df1 <- actual %>%
+        select(date, progress) %>%
+        setNames(c("x", "y")) %>%
+        as.data.frame()
+      
+      # Acc.Actual table
+      df2 <- actual %>%
+        select(date, csum) %>%
+        setNames(c("x", "y")) %>%
+        as.data.frame()
+      
+      vb1 <- list(
+        value = paste0(acc.previous,"%"),
+        data = df2,# with column name x, y
+        label = "",
+        chart_type = "",
+        subtitle = "",
+        info = "",
+        icon = icon("code"),
+        color = "orange"
+      )
+      
+      vboxSRV("vb1", vb1)
+      
+      vb2 <- list(
+        value = paste0(this,"%"),
+        data = df1,# with column name x, y
+        label = "",
+        chart_type = "",
+        subtitle = "",
+        info = "",
+        icon = icon("code"),
+        color = "orange"
+      )
+      
+      vboxSRV("vb2", vb2)
+      
+      vb3 <- list(
+        value = paste0(acc.this,"%"),
+        data = df1,# with column name x, y
+        label = "",
+        chart_type = "column",
+        subtitle = "",
+        info = "",
+        icon = icon("code"),
+        color = "orange"
+      )
+      
+      vboxSRV("vb3", vb3)
+      
+      vb4 <- list(
+        value = paste0(status, " days"),
+        data = df2,# with column name x, y
+        label = "",
+        chart_type = "line",
+        subtitle = "",
+        info = "",
+        icon = icon("code"),
+        color = "orange"
+      )
+      
+      vboxSRV("vb4", vb4)
+    }
+
   })
   
   

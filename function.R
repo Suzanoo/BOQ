@@ -36,6 +36,21 @@ render_table <- function(df){
 } 
 
 # change date-time format of ex 44592 --> 31/1/22
+int_to_date <- function(y){
+  list <- NULL
+  for(i in c(1:length(y))){
+    if(!is.na(stringr::str_match(y[i], "[0-9]{4}"))){
+      x <- substr(y[i], start = 1, stop = 5)
+      list[i] = as.Date(as.numeric(x), origin = "1899-12-30") %>%
+        as.character() #save to as character of date format
+    }else{
+      list[i] = y[i]
+    }
+  }
+  list
+}
+
+# change date-time format of ex 44592...52 --> 31/1/22
 convert_intTOdate <- function(y){
   list <- NULL
   for(i in c(1:length(y))){
@@ -144,42 +159,7 @@ progress_table <- function(df){
   df
 }
 
-# create estimate and actual progress table prepare for plotting
-est.act_table <- function(df){
-  
-  # split column of estimate progress and actual progress
-  index <- grep("[0-9]{4}...[0-9]{2}", names(df))
-  index1 <- index[1:(length(index)/2)] # plane zone
-  index2 <- index[(1+length(index)/2):length(index)] # actual zone
-  
-  # split df of estimate progress and actual progress
-  estimate <- df[index1]
-  actual <- df[index2]
-  
-  # change date-time format
-  names(estimate) <- convert_intTOdate(names(estimate))
-  names(actual) <- convert_intTOdate(names(actual))
-  
-  # calculation
-  # we have %weigth column of each activity = wt
-  # we have %report in each cell --> ci = 30%, 40%, 50%, ...
-  # we multiply --> ci = wt * ci/100
-  weigth <- df %>% select(matches("Percent_Wt"))
-  
-  estimate <- estimate %>%
-    mutate_all(.,function(col){weigth$Percent_Wt*col/100})
-  
-  actual <- actual %>%
-    mutate_all(.,function(col){weigth$Percent_Wt*col/100})
-  
-  # merge and return
-  plan <-  progress_table(estimate)
-  
-  actual <-  progress_table(actual) %>% 
-    filter(progress != 0)
-  
-  return(list(plan, actual))
-}
+
 
 
 
